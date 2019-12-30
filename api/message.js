@@ -31,6 +31,13 @@ export const getAllMessages = ({ receiver }) => {
   })
 }
 
+export const getAllMessagesForSender = ({ receiver, sender }) => {
+  return makeMessageRequest({
+    endpoint: `/messages/all/receiver/${receiver}/sender/${sender}`,
+    method: 'GET'
+  })
+}
+
 export const getUnreadMessages = ({ receiver }) => {
   return makeMessageRequest({
     endpoint: `/messages/unread/${receiver}`,

@@ -28,10 +28,10 @@ class SurferDetail extends Component {
   }
   handleMessageOpen = () => {
     const { navigation, user } = this.props
-    const { surfer } = this.state 
+    const { surfer } = this.state
     navigation.navigate('Message', {
-      sender: user.username,
-      receiver: surfer.username,
+      sender: user,
+      receiver: surfer,
       image: user.profileImagePath || null
     })
   }
@@ -66,7 +66,11 @@ class SurferDetail extends Component {
               }}
             >
               <Image
-                source={profileImagePath ? { uri: profileImagePath } : require('../assets/kells.jpg')}
+                source={
+                  profileImagePath
+                    ? { uri: profileImagePath }
+                    : require('../assets/kells.jpg')
+                }
                 style={{
                   width: 200,
                   height: 200,
@@ -83,9 +87,7 @@ class SurferDetail extends Component {
                 height: 75
               }}
             >
-              <Text style={styles.labelText}>
-                Name:
-              </Text>
+              <Text style={styles.labelText}>Name:</Text>
               <Text>
                 {firstName} {lastName}
               </Text>
@@ -98,12 +100,8 @@ class SurferDetail extends Component {
                 height: 75
               }}
             >
-              <Text style={styles.labelText}>
-                Location:
-              </Text>
-              <Text>
-                92013 (San Diego)
-              </Text>
+              <Text style={styles.labelText}>Location:</Text>
+              <Text>92013 (San Diego)</Text>
             </Row>
             <Row
               style={{
@@ -113,12 +111,8 @@ class SurferDetail extends Component {
                 height: 75
               }}
             >
-              <Text style={styles.labelText}>
-                Hourly Rate:
-              </Text>
-              <Text>
-                {hourlyRate ? `$${hourlyRate}/hour` : '--'}
-              </Text>
+              <Text style={styles.labelText}>Hourly Rate:</Text>
+              <Text>{hourlyRate ? `$${hourlyRate}/hour` : '--'}</Text>
             </Row>
             <Row
               style={{
@@ -149,13 +143,13 @@ class SurferDetail extends Component {
 
 const styles = StyleSheet.create({
   baseText: {
-    fontFamily: 'Cochin',
+    fontFamily: 'Cochin'
   },
   labelText: {
     fontSize: 15,
     marginRight: 10,
-    fontWeight: 'bold',
-  },
+    fontWeight: 'bold'
+  }
 })
 
 const mapStateToProps = state => {

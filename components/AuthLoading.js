@@ -50,7 +50,6 @@ class AuthLoadingScreen extends React.Component {
       receiver: username
     })
     const messages = messageData.messages
-    console.log('MESSIES', messages)
     setMessages({ messages })
   }
 
