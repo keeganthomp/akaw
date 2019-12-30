@@ -7,27 +7,140 @@ import {
   Button,
   Right,
   Body,
-  Icon,
   Title,
   Text,
-  Thumbnail
+  Form,
+  Item,
+  Input,
+  Toast,
+  Label,
+  Icon
 } from 'native-base'
 import { Col, Row, Grid } from 'react-native-easy-grid'
+import { Image } from 'react-native'
 import { connect } from 'react-redux'
 import { logout } from '../authentication/auth'
+import { updateSurfeeFromUsername } from 'surfingit/api/surfee'
+import { updateSurferFromUsername } from 'surfingit/api/surfer'
+import { uploadImageOnS3 } from 'surfingit/api/s3'
+import {
+  getCameraPermisions,
+  getCameraRollPermisions,
+  openImageSelector,
+  openCamera
+} from '../helpers/camera'
+import { setUser } from '../actions/userActions'
+import { bindActionCreators } from 'redux'
 
 class Account extends Component {
   static navigationOptions = {
     header: null
+  }
+  constructor (props) {
+    super()
+    this.state = {
+      firstName: props.user.firstName || '',
+      lastName: props.user.lastName || '',
+      email: props.user.email || '',
+      profileImagePath: props.user.profileImagePath || null,
+      accountType: props.user.accountType,
+      image: null
+    }
   }
   handleLogout = () => {
     const { navigation } = this.props
     const navigate = navigation.navigate
     logout({ navigate })
   }
+
+  setAndSaveProfileImage = async ({ image, imageName }) => {
+    const { user, setUser } = this.props
+    const { uri } = image
+    const username = user.username
+    this.setState({ image: uri })
+    const { body: response } = await uploadImageOnS3({
+      uri,
+      username,
+      imageName
+    })
+    const { location } = response.postResponse
+    setUser({
+      user: {
+        ...user,
+        profileImagePath: location
+      }
+    })
+    if (user.accountType === 'surfer') {
+      updateSurferFromUsername({
+        username,
+        data: {
+          profileImagePath: location
+        }
+      })
+    } else {
+      updateSurfeeFromUsername({
+        username,
+        data: {
+          profileImagePath: location
+        }
+      })
+    }
+    Toast.show({
+      text: 'Profile Picture Updated',
+      buttonText: 'Okay'
+    })
+  }
+
+  initializeImageSelect = async () => {
+    const cameraAccessStatus = await getCameraPermisions()
+    const cameraRollAccessStatus = await getCameraRollPermisions()
+    const canAccessCameraRoll = cameraRollAccessStatus === 'granted'
+    const canAccessCamera = cameraAccessStatus === 'granted'
+    if (canAccessCameraRoll) {
+      openImageSelector({ callback: this.setAndSaveProfileImage })
+    }
+  }
+  handleUserUpdate = async () => {
+    const { accountType, firstName, lastName } = this.state
+    const { user } = this.props
+    const hasDataChanged =
+      firstName &&
+      user.firstName !== firstName &&
+      lastName &&
+      user.lastName !== lastName
+    const userData = {
+      firstName,
+      lastName
+    }
+    const { username } = user
+    if (hasDataChanged) {
+      if (accountType === 'surfee') {
+        await updateSurfeeFromUsername({ username, data: userData })
+        Toast.show({
+          text: 'Profile Updated!',
+          buttonText: 'Okay'
+        })
+      } else {
+        await updateSurferFromUsername({ username, data: userData })
+        Toast.show({
+          text: 'Profile Updated!',
+          buttonText: 'Okay'
+        })
+      }
+    } else {
+      Toast.show({
+        text: 'Nothing has changed',
+        buttonText: 'Okay'
+      })
+    }
+  }
   render () {
-    const { navigation, user } = this.props
-    console.log('USER IN ACCOUNT', user)
+    const { firstName, lastName, email, image, profileImagePath } = this.state
+    const { user } = this.props
+    const isSurfer = user.accountType === 'surfer'
+    const profileImageSource = (image || profileImagePath) && {
+      uri: image || profileImagePath
+    }
     return (
       <Container>
         <Header>
@@ -46,41 +159,93 @@ class Account extends Component {
                 justifyContent: 'center',
                 height: 200
               }}
+              onPress={() => this.initializeImageSelect()}
             >
-              <Thumbnail large source={require('../assets/kells.jpg')} />
+              <Image
+                source={profileImageSource || require('../assets/kells.jpg')}
+                style={{ width: 200, height: 200, borderRadius: 200 / 2, marginTop: 15 }}
+              />
             </Row>
-            <Row
+            <Form
               style={{
-                display: 'flex',
+                flex: 1,
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <Text>First Name</Text>
-            </Row>
+              <Item stackedLabel style={{ width: 300, marginRight: 10 }}>
+                <Label>First Name</Label>
+                <Input
+                  onChangeText={firstName => this.setState({ firstName })}
+                  placeholder='First Name'
+                  value={firstName}
+                  autoCapitalize='none'
+                  style={{ textAlign: 'center' }}
+                />
+              </Item>
+              <Item stackedLabel style={{ width: 300, marginRight: 10 }}>
+                <Label>Last Name</Label>
+
+                <Input
+                  onChangeText={lastName => this.setState({ lastName })}
+                  value={lastName}
+                  placeholder='Last Name'
+                  autoCapitalize='none'
+                  placeholderText
+                  style={{ textAlign: 'center' }}
+                />
+              </Item>
+              <Item
+                success
+                style={{ width: 300, marginRight: 10, marginTop: 15 }}
+              >
+                <Input
+                  onChangeText={email => this.setState({ email })}
+                  value={email}
+                  placeholder='example@example.com'
+                  autoCapitalize='none'
+                  placeholderText
+                  style={{ textAlign: 'center' }}
+                  disabled
+                />
+                <Icon name='checkmark-circle' />
+              </Item>
+            </Form>
             <Row
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Text>Last Name</Text>
-            </Row>
-            <Row
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                height: 200
               }}
             >
               <Button
                 block
-                onPress={() => this.handleLogout()}
+                onPress={() => this.handleUserUpdate()}
                 style={{
                   marginHorizontal: 5,
                   marginVertical: 10,
                   backgroundColor: '#51F6BB'
+                }}
+              >
+                <Text style={{ textAlign: 'center' }}>Save</Text>
+              </Button>
+            </Row>
+            <Row
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 200
+              }}
+            >
+              <Button
+                block
+                danger
+                onPress={() => this.handleLogout()}
+                style={{
+                  marginHorizontal: 5,
+                  marginVertical: 10
                 }}
               >
                 <Text style={{ textAlign: 'center' }}>Logout</Text>
@@ -98,4 +263,12 @@ const mapStateToProps = state => {
   return { user }
 }
 
-export default connect(mapStateToProps)(Account)
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      setUser
+    },
+    dispatch
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(Account)

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import SurferCard from "./SurferCard";
+import React, { Component } from 'react'
+import SurferCard from './SurferCard'
 import {
   Container,
   Content,
@@ -10,39 +10,46 @@ import {
   Body,
   Icon,
   Title
-} from "native-base";
+} from 'native-base'
+import { connect } from 'react-redux'
 
-class HomeScreen extends Component {
+class SurferList extends Component {
+  constructor (props) {
+    super()
+    this.state = {
+      surfers: []
+    }
+  }
   static navigationOptions = {
     header: null
-  };
-  render() {
-    const { navigation } = this.props
+  }
+  render () {
+    const { navigation, surfer } = this.props
+    const { listOfSurfers } = surfer
     return (
       <Container>
         <Header>
-          {/* <Left>
-            <Button transparent>
-              <Icon name="menu" />
-            </Button>
-          </Left> */}
           <Body>
             <Title>Select a surfer</Title>
           </Body>
-          {/* <Right>
-            <Button transparent>
-              <Icon name="person" />
-            </Button>
-          </Right> */}
         </Header>
         <Content>
-          <SurferCard navigation={navigation}/>
-          <SurferCard />
-          <SurferCard />
+          {listOfSurfers.map(registeredSurfer => (
+            <SurferCard
+              key={registeredSurfer._id}
+              surfer={registeredSurfer}
+              navigation={navigation}
+            />
+          ))}
         </Content>
       </Container>
-    );
+    )
   }
 }
 
-export default HomeScreen;
+const mapStateToProps = state => {
+  const { surfer } = state
+  return { surfer }
+}
+
+export default connect(mapStateToProps)(SurferList)

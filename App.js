@@ -1,7 +1,7 @@
 import React from 'react'
-import { Icon } from 'native-base'
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { Icon, Root } from 'native-base'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import rootReducer from './reducers'
 import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
@@ -13,7 +13,9 @@ import SignupScreen from './authentication/Signup'
 import HomeScreen from './components/Homescreen'
 import SurferList from './components/SurferList'
 import SurferDetail from './components/SurferDetail'
+import Message from './components/Message'
 import Account from './components/Account'
+import Notifications from './components/Notifications'
 
 const store = createStore(rootReducer)
 
@@ -24,7 +26,8 @@ const AuthStack = createStackNavigator({
 
 const SurferStack = createStackNavigator({
   SurferList: SurferList,
-  SurferDetail: SurferDetail
+  SurferDetail: SurferDetail,
+  Message: Message
 })
 
 const MainTabs = createBottomTabNavigator(
@@ -48,6 +51,16 @@ const MainTabs = createBottomTabNavigator(
         )
       }
     },
+    NotificationScreen: {
+      screen: Notifications,
+      navigationOptions: {
+        title: 'notifications',
+        // tabBarColor: Colors.bottomHomeColor,
+        tabBarIcon: ({ tintColor, focused }) => (
+          <Icon size={50} name='mail' style={{ color: tintColor }} />
+        )
+      }
+    },
     Account: {
       screen: Account,
       navigationOptions: {
@@ -64,7 +77,7 @@ const MainTabs = createBottomTabNavigator(
       activeTintColor: '#333',
       inactiveTintColor: '#fff',
       style: {
-        backgroundColor: '#51F6BB',
+        backgroundColor: '#51F6BB'
       }
     }
   }
@@ -84,11 +97,13 @@ const Navigation = createAppContainer(
 )
 
 export default class App extends React.Component {
-  render() {
+  render () {
     return (
       <Provider store={store}>
-        <Navigation />
+        <Root>
+          <Navigation />
+        </Root>
       </Provider>
-    );
+    )
   }
 }

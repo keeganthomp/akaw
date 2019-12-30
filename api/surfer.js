@@ -11,6 +11,13 @@ const makeSurferRequest = ({ method, body = null, endpoint }) => {
   })
 }
 
+export const getSurfers = () => {
+  return makeSurferRequest({
+    endpoint: '/surfers',
+    method: 'GET'
+  })
+}
+
 export const createSurfer = ({ username, email }) => {
   return makeSurferRequest({
     endpoint: '/surfer',
@@ -22,9 +29,27 @@ export const createSurfer = ({ username, email }) => {
   })
 }
 
-export const getSurfer = ({ email }) => {
+export const getSurferFromEmail = ({ email }) => {
   return makeSurferRequest({
-    endpoint: `/surfer/${email}`,
+    endpoint: `/surfer/email/${email}`,
     method: 'GET'
+  })
+}
+
+export const getSurferFromUsername = ({ username }) => {
+  return makeSurferRequest({
+    endpoint: `/surfer/username/${username}`,
+    method: 'GET'
+  })
+}
+
+export const updateSurferFromUsername = ({ username, data }) => {
+  return makeSurferRequest({
+    endpoint: '/surfer',
+    method: 'PUT',
+    body: {
+      username,
+      data
+    }
   })
 }

@@ -1,7 +1,7 @@
 import Amplify, { Auth } from 'aws-amplify'
 import { AsyncStorage } from 'react-native'
-import { getSurfee } from 'surfingit/api/surfee'
-import { getSurfer } from 'surfingit/api/surfer'
+import { getSurfeeFromUsername } from 'surfingit/api/surfee'
+import { getSurferFromUsername } from 'surfingit/api/surfer'
 
 import {
   AWS_IDENTITY_POOL_ID,
@@ -75,10 +75,11 @@ export const signIn = async ({ navigate, username, password, setUser }) => {
       Auth.setupTOTP(user)
     } else {
       const { signInUserSession } = user
-      const email = user.attributes.email
+      const userData = signInUserSession.accessToken.payload
+      const username = userData.username
       const accountType = user.attributes['custom:accountType']
       if (accountType === 'surfer') {
-        const surferResponse = await getSurfer({ email })
+        const surferResponse = await getSurferFromUsername({ username })
         const user = surferResponse.data.surfer
         setUser({
           user: {
@@ -87,7 +88,7 @@ export const signIn = async ({ navigate, username, password, setUser }) => {
           }
         })
       } else {
-        const surfeeResponse = await getSurfee({ email })
+        const surfeeResponse = await getSurfeeFromUsername({ username })
         const user = surfeeResponse.data.surfee
         setUser({
           user: {
@@ -99,6 +100,7 @@ export const signIn = async ({ navigate, username, password, setUser }) => {
       const accessToken = signInUserSession.accessToken.jwtToken
       const idToken = signInUserSession.idToken.jwtToken
       AsyncStorage.setItem('userToken', accessToken)
+      AsyncStorage.setItem('idToken', idToken)
       navigate('App')
     }
   } catch (err) {

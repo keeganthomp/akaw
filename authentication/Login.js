@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, AsyncStorage } from 'react-native'
+import { View } from 'react-native'
 import { signIn } from './auth'
 import AutoHeightImage from 'react-native-auto-height-image'
-import { getSurfee } from 'surfingit/api/surfee'
 import {
   Container,
   Content,
@@ -41,9 +40,6 @@ class Login extends Component {
     this.setLoggingInStatus({ status: true })
     const { navigation, setUser } = this.props
     const { username, password } = this.state
-    // const surfeeResponse = await getSurfee({ username })
-    // const surfee = surfeeResponse.data.surfee
-    // setUser({ user: surfee })
     await signIn({
       username,
       password,
@@ -51,7 +47,6 @@ class Login extends Component {
       setLoggingInStatus: this.setLoggingInStatus,
       setUser
     })
-
   }
 
   render () {

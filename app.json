@@ -7,7 +7,15 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.kat.surfingit"
+      "bundleIdentifier": "com.kat.surfingit",
+      "infoPlist": {
+        "NSAppTransportSecurity" : {
+          "NSAllowsArbitraryLoads" : true,
+          "NSAllowsArbitraryLoadsForMedia": true, 
+          "NSAllowsArbitraryLoadsInWebContent": true, 
+          "NSExceptionAllowsInsecureHTTPLoads": true
+        }
+      }
     },
     "slug": "surfing-it",
     "privacy": "unlisted",

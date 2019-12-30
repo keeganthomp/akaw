@@ -28,7 +28,6 @@ class HomeScreen extends Component {
 
   render () {
     const { user } = this.props
-    console.log('USER IN HOMESCREEN', user)
     return (
       <Container>
         <Header>
@@ -65,8 +64,8 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = state => {
-  const { user } = state
-  return { user }
+  const { user, surfer } = state
+  return { user, surfer }
 }
 
 export default connect(mapStateToProps)(HomeScreen)

@@ -23,9 +23,27 @@ export const createSurfee = ({ username, email }) => {
   })
 }
 
-export const getSurfee = ({ email }) => {
+export const getSurfeeFromEmail = ({ email }) => {
   return makeSurfeeRequest({
-    endpoint: `/surfee/${email}`,
+    endpoint: `/surfee/email/${email}`,
     method: 'GET'
+  })
+}
+
+export const getSurfeeFromUsername = ({ username }) => {
+  return makeSurfeeRequest({
+    endpoint: `/surfee/username/${username}`,
+    method: 'GET'
+  })
+}
+
+export const updateSurfeeFromUsername = ({ username, data }) => {
+  return makeSurfeeRequest({
+    endpoint: '/surfee',
+    method: 'PUT',
+    body: {
+      username,
+      data
+    }
   })
 }
