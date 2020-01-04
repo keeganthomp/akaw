@@ -18,7 +18,9 @@ import {
   Label
 } from 'native-base'
 import { bindActionCreators } from 'redux'
-import { setUser } from '../actions/userActions'
+import { setUser, setConversations } from '../actions/userActions'
+import { setSurfers } from '../actions/surferActions'
+
 import { connect } from 'react-redux'
 
 class Signup extends Component {
@@ -70,7 +72,7 @@ class Signup extends Component {
       isSigningUp,
       accountType
     } = this.state
-    const { navigation, setUser } = this.props
+    const { navigation, setUser, setSurfers, setConversations } = this.props
     return (
       <Container>
         {isSigningUp ? (
@@ -90,6 +92,8 @@ class Signup extends Component {
                 password={password}
                 navigate={navigation.navigate}
                 setUser={setUser}
+                setConversations={setConversations}
+                setSurfers={setSurfers}
               />
             ) : (
               <Content
@@ -192,7 +196,9 @@ class Signup extends Component {
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      setUser
+      setUser,
+      setConversations,
+      setSurfers
     },
     dispatch
   )

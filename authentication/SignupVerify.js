@@ -24,11 +24,25 @@ class VerifySignup extends Component {
 
   handleVerification = async () => {
     const { verificationCode } = this.state
-    const { username, password, navigate, setUser } = this.props
+    const {
+      username,
+      password,
+      navigate,
+      setUser,
+      setConversations,
+      setSurfers
+    } = this.props
     this.setState({ isVerifyingUser: true })
     try {
       await confrimSingup({ username, code: verificationCode })
-      signIn({ username, password, navigate, setUser })
+      await signIn({
+        username,
+        password,
+        navigate,
+        setUser,
+        setConversations,
+        setSurfers
+      })
     } catch (error) {
       console.log('Error signing up:', error)
       this.setState({ isVerifyingUser: false })
@@ -62,6 +76,7 @@ class VerifySignup extends Component {
                   placeholder='Verification Code'
                   value={verificationCode}
                   autoCapitalize='none'
+                  keyboardType='number-pad'
                 />
               </Item>
               {error && <Text style={{ color: 'red' }}>{error}</Text>}

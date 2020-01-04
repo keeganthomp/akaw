@@ -17,9 +17,10 @@ import {
   Icon
 } from 'native-base'
 import { Col, Row, Grid } from 'react-native-easy-grid'
-import { Image } from 'react-native'
+import { Image, View, TextInput } from 'react-native'
 import { connect } from 'react-redux'
 import { logout } from '../authentication/auth'
+import NumericInput from 'react-native-numeric-input'
 import { updateUserFromUsername } from 'surfingit/api/user'
 import { uploadImageOnS3 } from 'surfingit/api/s3'
 import {
@@ -43,7 +44,10 @@ class Account extends Component {
       email: props.user.email || '',
       profileImagePath: props.user.profileImagePath || null,
       accountType: props.user.accountType,
-      image: null
+      image: null,
+      hourlyRate: props.user.hourlyRate
+        ? props.user.hourlyRate.toString()
+        : null
     }
   }
   handleLogout = () => {
@@ -91,14 +95,16 @@ class Account extends Component {
     }
   }
   handleUserUpdate = async () => {
-    const { firstName, lastName } = this.state
+    const { firstName, lastName, hourlyRate } = this.state
     const { user } = this.props
     const hasDataChanged =
       (firstName && user.firstName !== firstName) ||
-      (lastName && user.lastName !== lastName)
+      (lastName && user.lastName !== lastName) ||
+      (hourlyRate && user.hourlyRate !== hourlyRate)
     const userData = {
       firstName,
-      lastName
+      lastName,
+      hourlyRate
     }
     const { username } = user
     if (hasDataChanged) {
@@ -115,7 +121,14 @@ class Account extends Component {
     }
   }
   render () {
-    const { firstName, lastName, email, image, profileImagePath } = this.state
+    const {
+      firstName,
+      lastName,
+      email,
+      image,
+      profileImagePath,
+      hourlyRate
+    } = this.state
     const { user } = this.props
     const isSurfer = user.accountType === 'surfer'
     const profileImageSource = (image || profileImagePath) && {
@@ -194,9 +207,27 @@ class Account extends Component {
                   placeholderText
                   style={{ textAlign: 'center' }}
                   disabled
+                  keyboardType='email-address'
                 />
                 <Icon name='checkmark-circle' />
               </Item>
+              {isSurfer && (
+                <Item stackedLabel style={{ width: 300, marginRight: 10 }}>
+                  <Label>Hourly Rate</Label>
+                  {console.log('HOURLY RATE', this.state.hourlyRate)}
+                  <TextInput
+                    onChangeText={hourlyRate =>
+                      this.setState({ hourlyRate: hourlyRate.replace('$', '') })
+                    }
+                    value={`$${hourlyRate || ''}`}
+                    placeholder={'25'}
+                    autoCapitalize='none'
+                    placeholderText
+                    style={{ textAlign: 'center' }}
+                    keyboardType='number-pad'
+                  />
+                </Item>
+              )}
             </Form>
             <Row
               style={{

@@ -9,7 +9,6 @@ import Chat from '../components/Chat'
 import HomeScreen from '../components/Homescreen'
 import Notifications from '../components/Notifications'
 import Account from '../components/Account'
-// import { Avatar, Badge, Icon, withBadge } from 'react-native-elements'
 
 const NAV_ICON_SIZE = 35
 

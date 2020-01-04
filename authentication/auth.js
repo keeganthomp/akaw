@@ -43,7 +43,8 @@ export const signIn = async ({
   password,
   setUser,
   setConversations,
-  setSurfers
+  setSurfers,
+  setLoginError
 }) => {
   try {
     const user = await Auth.signIn(username, password)
@@ -85,31 +86,34 @@ export const signIn = async ({
       const userData = signInUserSession.accessToken.payload
       const username = userData.username
       const { data: surferData } = await getSurfers({ username })
-      console.log('SURFER DATA', surferData)
       const surfers = surferData.surfers
-      setSurfers({ surfers })
       const userResponse = await getUserFromUsername({ username })
       const userFromDb = userResponse.data.user
-      setUser({
-        user: userFromDb
-      })
       const { data: conversations } = await getConversations({
         user: username
       })
       const { data: unreadConversations } = await getUnreadMessages({
         user: username
       })
-      const notificationCount = unreadConversations.length
-      await AsyncStorage.setItem('notifications', notificationCount)
+      const { notifications } = unreadConversations
+      const notificationCount = JSON.stringify(notifications.length)
+      setSurfers({ surfers })
+      setUser({
+        user: userFromDb
+      })
       setConversations({ conversations })
       const accessToken = signInUserSession.accessToken.jwtToken
       const idToken = signInUserSession.idToken.jwtToken
-      AsyncStorage.setItem('userToken', accessToken)
-      AsyncStorage.setItem('idToken', idToken)
+      await AsyncStorage.setItem('notifications', notificationCount)
+      await AsyncStorage.setItem('userToken', accessToken)
+      await AsyncStorage.setItem('idToken', idToken)
       navigate('App')
     }
   } catch (err) {
-    console.log('Error logging in:', err)
+    console.log('Error logging in:', err.message)
+    if (setLoginError) {
+      setLoginError({ error: 'Incorrect username or password' })
+    }
     if (err.code === 'UserNotConfirmedException') {
       // The error happens if the user didn't finish the confirmation step when signing up
       // In this case you need to resend the code and confirm the user
@@ -123,7 +127,7 @@ export const signIn = async ({
     } else if (err.code === 'UserNotFoundException') {
       // The error happens when the supplied username/email does not exist in the Cognito user pool
     } else {
-      console.log(err)
+      console.log('Uncaught Error:', err)
     }
   }
 }

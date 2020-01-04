@@ -27,10 +27,23 @@ class Login extends Component {
   }
 
   setUsername = ({ username }) => {
+    if (this.state.error) {
+      this.setState({ error: null })
+    }
     this.setState({ username })
   }
   setPassword = ({ password }) => {
+    if (this.state.error) {
+      this.setState({ error: null })
+    }
     this.setState({ password })
+  }
+
+  setLoginError = ({ error }) => {
+    this.setState({
+      error,
+      isLoggingIn: false
+    })
   }
 
   setLoggingInStatus = ({ status }) => {
@@ -48,7 +61,8 @@ class Login extends Component {
       setLoggingInStatus: this.setLoggingInStatus,
       setUser,
       setConversations,
-      setSurfers
+      setSurfers,
+      setLoginError: this.setLoginError
     })
   }
 
@@ -81,7 +95,7 @@ class Login extends Component {
             <Form>
               <Item>
                 <Input
-                  onChangeText={username => this.setState({ username })}
+                  onChangeText={username => this.setUsername({ username })}
                   placeholder='Username'
                   value={username}
                   autoCapitalize='none'
@@ -89,7 +103,7 @@ class Login extends Component {
               </Item>
               <Item last>
                 <Input
-                  onChangeText={password => this.setState({ password })}
+                  onChangeText={password => this.setPassword({ password })}
                   value={password}
                   secureTextEntry
                   placeholder='Password'
@@ -98,7 +112,11 @@ class Login extends Component {
                 />
               </Item>
             </Form>
-            {error && <Text style={{ color: 'red' }}>{error}</Text>}
+            {error && (
+              <Text style={{ color: 'red', textAlign: 'center', marginTop: 8 }}>
+                {error}
+              </Text>
+            )}
             <Button
               block
               onPress={() => this.handleLogin()}
