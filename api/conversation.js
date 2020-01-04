@@ -38,3 +38,10 @@ export const getConversations = ({ user }) => {
   })
 }
 
+export const getUnreadMessages= ({ user }) => {
+  return makeConversationRequest({
+    endpoint: `/notifications/${user}`,
+    method: 'GET'
+  })
+}
+

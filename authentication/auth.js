@@ -1,7 +1,7 @@
 import Amplify, { Auth } from 'aws-amplify'
 import { AsyncStorage } from 'react-native'
 import { getUserFromUsername, getSurfers } from 'surfingit/api/user'
-import { getConversations } from 'surfingit/api/conversation'
+import { getConversations, getUnreadMessages } from 'surfingit/api/conversation'
 
 import {
   AWS_IDENTITY_POOL_ID,
@@ -96,6 +96,11 @@ export const signIn = async ({
       const { data: conversations } = await getConversations({
         user: username
       })
+      const { data: unreadConversations } = await getUnreadMessages({
+        user: username
+      })
+      const notificationCount = unreadConversations.length
+      await AsyncStorage.setItem('notifications', notificationCount)
       setConversations({ conversations })
       const accessToken = signInUserSession.accessToken.jwtToken
       const idToken = signInUserSession.idToken.jwtToken

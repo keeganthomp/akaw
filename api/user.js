@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const USER_API_URL = __DEV__ ? 'https://localhost:3005/api/user' : ''
+const USER_API_URL = __DEV__ ? 'http://localhost:3005/api/user' : ''
 
 const makeUserRequest = ({ method, body = null, endpoint }) => {
   const finalUrl = USER_API_URL + endpoint

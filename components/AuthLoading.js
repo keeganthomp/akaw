@@ -5,7 +5,7 @@ import { setUser, setConversations } from '../actions/userActions'
 import { setSurfers } from '../actions/surferActions'
 import { bindActionCreators } from 'redux'
 import { getUserFromUsername, getSurfers } from 'surfingit/api/user'
-import { getConversations } from 'surfingit/api/conversation'
+import { getConversations, getUnreadMessages } from 'surfingit/api/conversation'
 const jwtDecode = require('jwt-decode')
 
 class AuthLoadingScreen extends React.Component {
@@ -31,6 +31,14 @@ class AuthLoadingScreen extends React.Component {
     const { data: conversations } = await getConversations({
       user: username
     })
+    const { data: unreadConversations } = await getUnreadMessages({
+      user: username
+    })
+    const { notifications } = unreadConversations
+    await AsyncStorage.setItem(
+      'notifications',
+      JSON.stringify(notifications.length)
+    )
     setConversations({ conversations })
   }
 
