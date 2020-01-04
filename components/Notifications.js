@@ -19,7 +19,7 @@ import {
 } from 'native-base'
 import { View } from 'react-native'
 import { connect } from 'react-redux'
-import { sendMessage } from '../api/message'
+import { sendMessage } from '../api/conversation'
 
 class Notifications extends Component {
   state = {
@@ -31,71 +31,56 @@ class Notifications extends Component {
 
   handleChatOpen = async ({ receiver }) => {
     const { navigation, user } = this.props
-    navigation.navigate('Message', {
+    navigation.navigate('Chat', {
       sender: user,
       receiver,
       image: user.profileImagePath || null
     })
   }
 
-  async componentDidMount () {
-    const {
-      user: { messages }
-    } = this.props
-    const groupedMessages = messages.reduce((acc, message) => {
-      const { sender } = message
-      const indexOfSenderMessages = acc.findIndex(
-        existingMessage => existingMessage.sender === sender
-      )
-      const senderAlreadyHaveMessages = indexOfSenderMessages > -1
-      if (senderAlreadyHaveMessages) {
-        acc[indexOfSenderMessages].messages.push(message)
-      } else {
-        acc.push({
-          sender,
-          messages: [message]
-        })
-      }
-      return acc
-    }, [])
-    this.setState({ receivedMessages: groupedMessages })
-  }
-
   render () {
-    const { receivedMessages } = this.state
+    const {
+      user: { conversations, username }
+    } = this.props
     return (
       <Container>
         <Header />
         <Content>
           <List>
-            {receivedMessages.map(receivedMessage => {
-              const { sender, messages } = receivedMessage
-              const latestMessage = messages[messages.length - 1]
+            {conversations.map((conversation, key) => {
+              const chatParticipant = conversation.between.filter(
+                participant => participant !== username
+              )[0]
+              const { lastMessage } = conversation
               return (
                 <ListItem
-                  onPress={() => this.handleChatOpen({ receiver: sender })}
+                  onPress={() =>
+                    this.handleChatOpen({ receiver: chatParticipant })
+                  }
                   thumbnail
-                  key={receivedMessage._id}
+                  key={key}
                 >
                   <Left>
                     <Thumbnail
                       square
                       source={
-                        latestMessage.image
-                          ? { uri: latestMessage.image }
-                          : require('../assets/kells.jpg')
+                        lastMessage.image
+                          ? { uri: lastMessage.image }
+                          : require('../assets/default-avatar.png')
                       }
                     />
                   </Left>
                   <Body>
-                    <Text>{sender}</Text>
+                    <Text>{lastMessage.sender}</Text>
                     <Text note numberOfLines={1}>
-                      {latestMessage.body}
+                      {lastMessage.body}
                     </Text>
                   </Body>
                   <Right>
                     <Button
-                      onPress={() => this.handleChatOpen({ receiver: sender })}
+                      onPress={() =>
+                        this.handleChatOpen({ receiver: chatParticipant })
+                      }
                       transparent
                     >
                       <Text>View</Text>

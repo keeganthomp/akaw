@@ -1,8 +1,7 @@
 import React from 'react'
 import { GiftedChat } from 'react-native-gifted-chat'
 import { connect } from 'react-redux'
-import { getAllMessagesForSender } from '../api/message'
-import { sendMessage } from '../api/message'
+import { getConversation, sendMessage } from '../api/conversation'
 
 class Chat extends React.Component {
   constructor (props) {
@@ -29,7 +28,7 @@ class Chat extends React.Component {
     const { receiver, sender } = this.state
     const {
       data: { messages }
-    } = await getAllMessagesForSender({
+    } = await getConversation({
       receiver: receiver.username || receiver,
       sender: sender.username || sender
     })
@@ -57,13 +56,13 @@ class Chat extends React.Component {
   }
 
   render () {
-    const { sender } = this.state
+    const { user: { username } } = this.props
     return (
       <GiftedChat
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         user={{
-          _id: sender.username || sender
+          _id: username
         }}
         onInputTextChanged={message => this.setState({ message })}
       />

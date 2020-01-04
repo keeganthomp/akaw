@@ -21,10 +21,18 @@ class SurferCard extends Component {
   }
   render () {
     const { surfer } = this.props
-    const { firstName, lastName, hourlyRate, profileImagePath } = surfer
+    const {
+      firstName,
+      lastName,
+      hourlyRate,
+      profileImagePath,
+      username
+    } = surfer
+    const surferDisplayName =
+      firstName && lastName ? `${firstName} ${lastName}` : username
     const thumbnailImageSource = profileImagePath
       ? { uri: profileImagePath }
-      : require('../assets/kells.jpg')
+      : require('../assets/default-avatar.png')
     return (
       <Card style={{ marginLeft: 10, marginRight: 10, marginBottom: 10 }}>
         <CardItem button onPress={() => this.handleSurferSelect()}>
@@ -32,13 +40,11 @@ class SurferCard extends Component {
             <Thumbnail large source={thumbnailImageSource} />
           </Left>
           <Body style={{ alignContent: 'center', justifyContent: 'center' }}>
-            <Text>
-              {firstName} {lastName}
-            </Text>
+            <Text>{surferDisplayName}</Text>
           </Body>
           <Right>
             <Text style={{ fontWeight: 'bold' }}>
-              {hourlyRate ? `$${hourlyRate}/hour` : '$40/hour'}
+              {hourlyRate ? `$${hourlyRate}/hour` : '--/hour'}
             </Text>
           </Right>
         </CardItem>

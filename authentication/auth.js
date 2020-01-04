@@ -1,7 +1,7 @@
 import Amplify, { Auth } from 'aws-amplify'
 import { AsyncStorage } from 'react-native'
-import { getSurfeeFromUsername } from 'surfingit/api/surfee'
-import { getSurferFromUsername } from 'surfingit/api/surfer'
+import { getUserFromUsername, getSurfers } from 'surfingit/api/user'
+import { getConversations } from 'surfingit/api/conversation'
 
 import {
   AWS_IDENTITY_POOL_ID,
@@ -37,7 +37,14 @@ export const confrimSingup = ({ username, code }) => {
   })
 }
 
-export const signIn = async ({ navigate, username, password, setUser }) => {
+export const signIn = async ({
+  navigate,
+  username,
+  password,
+  setUser,
+  setConversations,
+  setSurfers
+}) => {
   try {
     const user = await Auth.signIn(username, password)
     if (
@@ -77,26 +84,19 @@ export const signIn = async ({ navigate, username, password, setUser }) => {
       const { signInUserSession } = user
       const userData = signInUserSession.accessToken.payload
       const username = userData.username
-      const accountType = user.attributes['custom:accountType']
-      if (accountType === 'surfer') {
-        const surferResponse = await getSurferFromUsername({ username })
-        const user = surferResponse.data.surfer
-        setUser({
-          user: {
-            ...user,
-            accountType
-          }
-        })
-      } else {
-        const surfeeResponse = await getSurfeeFromUsername({ username })
-        const user = surfeeResponse.data.surfee
-        setUser({
-          user: {
-            ...user,
-            accountType
-          }
-        })
-      }
+      const { data: surferData } = await getSurfers({ username })
+      console.log('SURFER DATA', surferData)
+      const surfers = surferData.surfers
+      setSurfers({ surfers })
+      const userResponse = await getUserFromUsername({ username })
+      const userFromDb = userResponse.data.user
+      setUser({
+        user: userFromDb
+      })
+      const { data: conversations } = await getConversations({
+        user: username
+      })
+      setConversations({ conversations })
       const accessToken = signInUserSession.accessToken.jwtToken
       const idToken = signInUserSession.idToken.jwtToken
       AsyncStorage.setItem('userToken', accessToken)

@@ -20,8 +20,7 @@ import { Col, Row, Grid } from 'react-native-easy-grid'
 import { Image } from 'react-native'
 import { connect } from 'react-redux'
 import { logout } from '../authentication/auth'
-import { updateSurfeeFromUsername } from 'surfingit/api/surfee'
-import { updateSurferFromUsername } from 'surfingit/api/surfer'
+import { updateUserFromUsername } from 'surfingit/api/user'
 import { uploadImageOnS3 } from 'surfingit/api/s3'
 import {
   getCameraPermisions,
@@ -70,21 +69,12 @@ class Account extends Component {
         profileImagePath: location
       }
     })
-    if (user.accountType === 'surfer') {
-      updateSurferFromUsername({
-        username,
-        data: {
-          profileImagePath: location
-        }
-      })
-    } else {
-      updateSurfeeFromUsername({
-        username,
-        data: {
-          profileImagePath: location
-        }
-      })
-    }
+    updateUserFromUsername({
+      username,
+      data: {
+        profileImagePath: location
+      }
+    })
     Toast.show({
       text: 'Profile Picture Updated',
       buttonText: 'Okay'
@@ -101,32 +91,22 @@ class Account extends Component {
     }
   }
   handleUserUpdate = async () => {
-    const { accountType, firstName, lastName } = this.state
+    const { firstName, lastName } = this.state
     const { user } = this.props
     const hasDataChanged =
-      firstName &&
-      user.firstName !== firstName &&
-      lastName &&
-      user.lastName !== lastName
+      (firstName && user.firstName !== firstName) ||
+      (lastName && user.lastName !== lastName)
     const userData = {
       firstName,
       lastName
     }
     const { username } = user
     if (hasDataChanged) {
-      if (accountType === 'surfee') {
-        await updateSurfeeFromUsername({ username, data: userData })
-        Toast.show({
-          text: 'Profile Updated!',
-          buttonText: 'Okay'
-        })
-      } else {
-        await updateSurferFromUsername({ username, data: userData })
-        Toast.show({
-          text: 'Profile Updated!',
-          buttonText: 'Okay'
-        })
-      }
+      await updateUserFromUsername({ username, data: userData })
+      Toast.show({
+        text: 'Profile Updated!',
+        buttonText: 'Okay'
+      })
     } else {
       Toast.show({
         text: 'Nothing has changed',
@@ -162,8 +142,15 @@ class Account extends Component {
               onPress={() => this.initializeImageSelect()}
             >
               <Image
-                source={profileImageSource || require('../assets/kells.jpg')}
-                style={{ width: 200, height: 200, borderRadius: 200 / 2, marginTop: 15 }}
+                source={
+                  profileImageSource || require('../assets/default-avatar.png')
+                }
+                style={{
+                  width: 200,
+                  height: 200,
+                  borderRadius: 200 / 2,
+                  marginTop: 15
+                }}
               />
             </Row>
             <Form

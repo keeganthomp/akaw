@@ -1,17 +1,11 @@
 import React from 'react'
-import {
-  ActivityIndicator,
-  AsyncStorage,
-  StatusBar,
-  View
-} from 'react-native'
+import { ActivityIndicator, AsyncStorage, StatusBar, View } from 'react-native'
 import { connect } from 'react-redux'
-import { setUser, setMessages } from '../actions/userActions'
+import { setUser, setConversations } from '../actions/userActions'
 import { setSurfers } from '../actions/surferActions'
 import { bindActionCreators } from 'redux'
-import { getSurfeeFromUsername } from 'surfingit/api/surfee'
-import { getSurferFromUsername, getSurfers } from 'surfingit/api/surfer'
-import { getUnreadMessages } from 'surfingit/api/message'
+import { getUserFromUsername, getSurfers } from 'surfingit/api/user'
+import { getConversations } from 'surfingit/api/conversation'
 const jwtDecode = require('jwt-decode')
 
 class AuthLoadingScreen extends React.Component {
@@ -20,46 +14,29 @@ class AuthLoadingScreen extends React.Component {
   }
 
   handleToken = async ({ userToken, idToken }) => {
-    const { setUser, setMessages } = this.props
+    const { setUser, setConversations, setSurfers } = this.props
     // cognito access token
     const decodedUserToken = jwtDecode(userToken)
     // cognito id token
     const decodedIdToken = jwtDecode(idToken)
-    const accountType = decodedIdToken['custom:accountType']
     const username = decodedIdToken['cognito:username']
-    if (accountType === 'surfer') {
-      const surfeeResponse = await getSurferFromUsername({ username })
-      const surfer = surfeeResponse.data.surfer
-      setUser({
-        user: {
-          ...surfer,
-          accountType
-        }
-      })
-    } else {
-      const surferResponse = await getSurfeeFromUsername({ username })
-      const surfee = surferResponse.data.surfee
-      setUser({
-        user: {
-          ...surfee,
-          accountType
-        }
-      })
-    }
-    const { data: messageData } = await getUnreadMessages({
-      receiver: username
+    const { data: surferData } = await getSurfers({ username })
+    const surfers = surferData.surfers
+    setSurfers({ surfers })
+    const userResponse = await getUserFromUsername({ username })
+    const user = userResponse.data.user
+    setUser({
+      user
     })
-    const messages = messageData.messages
-    setMessages({ messages })
+    const { data: conversations } = await getConversations({
+      user: username
+    })
+    setConversations({ conversations })
   }
 
   _bootstrapAsync = async () => {
-    const { setSurfers } = this.props
     const userToken = await AsyncStorage.getItem('userToken')
     const idToken = await AsyncStorage.getItem('idToken')
-    const { data: surferData } = await getSurfers()
-    const surfers = surferData.surfers
-    setSurfers({ surfers })
     if (userToken && idToken) {
       await this.handleToken({ userToken, idToken })
     }
@@ -84,7 +61,7 @@ const mapDispatchToProps = dispatch =>
     {
       setUser,
       setSurfers,
-      setMessages
+      setConversations
     },
     dispatch
   )

@@ -13,7 +13,6 @@ import SignupScreen from './authentication/Signup'
 import HomeScreen from './components/Homescreen'
 import SurferList from './components/SurferList'
 import SurferDetail from './components/SurferDetail'
-import Message from './components/Message'
 import Chat from './components/Chat'
 import Account from './components/Account'
 import Notifications from './components/Notifications'
@@ -26,9 +25,9 @@ const AuthStack = createStackNavigator({
 })
 
 const SurferStack = createStackNavigator({
-  SurferList: SurferList,
-  SurferDetail: SurferDetail,
-  Message: Chat
+  SurferList,
+  SurferDetail,
+  Chat
 })
 
 SurferStack.navigationOptions = ({ navigation }) => {

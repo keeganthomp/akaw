@@ -8,11 +8,11 @@ const userReducer = (state = INITIAL_STATE, action) => {
         ...state,
         ...currentUser
       }
-    case 'SET_MESSAGES':
-      const messages = action.payload
+    case 'SET_CONVERSATIONS':
+      const conversations = action.payload
       return {
         ...state,
-        messages
+        ...conversations
       }
     default:
       return state

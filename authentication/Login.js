@@ -13,8 +13,9 @@ import {
   Spinner
 } from 'native-base'
 import { bindActionCreators } from 'redux'
-import { setUser } from '../actions/userActions'
 import { connect } from 'react-redux'
+import { setUser, setConversations } from '../actions/userActions'
+import { setSurfers } from '../actions/surferActions'
 
 class Login extends Component {
   state = {
@@ -38,14 +39,16 @@ class Login extends Component {
 
   handleLogin = async () => {
     this.setLoggingInStatus({ status: true })
-    const { navigation, setUser } = this.props
+    const { navigation, setUser, setConversations, setSurfers } = this.props
     const { username, password } = this.state
     await signIn({
       username,
       password,
       navigate: navigation.navigate,
       setLoggingInStatus: this.setLoggingInStatus,
-      setUser
+      setUser,
+      setConversations,
+      setSurfers
     })
   }
 
@@ -123,7 +126,9 @@ class Login extends Component {
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      setUser
+      setUser,
+      setConversations,
+      setSurfers
     },
     dispatch
   )

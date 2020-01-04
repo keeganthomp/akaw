@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { signup } from './auth'
 import VerifySignup from './SignupVerify'
-import { createSurfee } from 'surfingit/api/surfee'
-import { createSurfer } from 'surfingit/api/surfer'
+import { createUser } from 'surfingit/api/user'
 import AutoHeightImage from 'react-native-auto-height-image'
 import {
   Container,
@@ -53,11 +52,7 @@ class Signup extends Component {
       const result = await signup({ username, password, email, accountType })
       const { userConfirmed } = result
       const createdUsername = username
-      if (accountType === 'surfee') {
-        await createSurfee({ username, email })
-      } else {
-        await createSurfer({ username, email })
-      }
+      await createUser({ username, email, accountType })
       this.setState({ createdUsername, userConfirmed, isSigningUp: false })
     } catch (error) {
       const { message } = error

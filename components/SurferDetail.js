@@ -29,7 +29,7 @@ class SurferDetail extends Component {
   handleMessageOpen = () => {
     const { navigation, user } = this.props
     const { surfer } = this.state
-    navigation.navigate('Message', {
+    navigation.navigate('Chat', {
       sender: user,
       receiver: surfer,
       image: user.profileImagePath || null
@@ -69,7 +69,7 @@ class SurferDetail extends Component {
                 source={
                   profileImagePath
                     ? { uri: profileImagePath }
-                    : require('../assets/kells.jpg')
+                    : require('../assets/default-avatar.png')
                 }
                 style={{
                   width: 200,
