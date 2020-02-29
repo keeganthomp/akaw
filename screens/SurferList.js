@@ -34,10 +34,10 @@ class SurferList extends Component {
           </Body>
         </Header>
         <Content>
-          {listOfSurfers.map(registeredSurfer => (
+          {listOfSurfers.map(surfer => (
             <SurferCard
-              key={registeredSurfer._id}
-              surfer={registeredSurfer}
+              key={surfer.id}
+              surfer={surfer}
               navigation={navigation}
             />
           ))}

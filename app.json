@@ -1,13 +1,13 @@
 {
-  "name": "surfingit",
-  "displayName": "Surfing-it",
+  "name": "akaw",
+  "displayName": "Akaw",
   "expo": {
-    "name": "surfingit",
+    "name": "akaw",
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.kat.surfingit",
+      "bundleIdentifier": "com.keegan.akaw",
       "infoPlist": {
         "NSAppTransportSecurity" : {
           "NSAllowsArbitraryLoads" : true,
@@ -15,12 +15,13 @@
           "NSAllowsArbitraryLoadsInWebContent": true, 
           "NSExceptionAllowsInsecureHTTPLoads": true
         }
-      }
+      },
+      "buildNumber":"2" 
     },
-    "slug": "surfing-it",
+    "slug": "akaw",
     "privacy": "unlisted",
     "sdkVersion": "36.0.0",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "entryPoint": "node_modules/expo/AppEntry.js",
     "platforms": [
       "ios",

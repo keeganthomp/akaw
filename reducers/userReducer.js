@@ -1,4 +1,6 @@
-const INITIAL_STATE = {}
+const INITIAL_STATE = {
+  notifications: []
+}
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
@@ -8,12 +10,15 @@ const userReducer = (state = INITIAL_STATE, action) => {
         ...state,
         ...currentUser
       }
-    case 'SET_CONVERSATIONS':
-      const conversations = action.payload
+    case 'SET_NOTIFICATIONS':
+      const newNotification = action.payload
+      const updatedNotifications = [...state.notifications, newNotification]
       return {
         ...state,
-        ...conversations
+        notifications: updatedNotifications
       }
+    case 'CLEAR_DATA':
+      return INITIAL_STATE
     default:
       return state
   }

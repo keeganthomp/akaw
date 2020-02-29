@@ -1,6 +1,5 @@
 import axios from 'axios'
-
-const USER_API_URL = __DEV__ ? 'http://localhost:3005/api/user' : ''
+import { USER_API_URL } from './constants'
 
 const makeUserRequest = ({ method, body = null, endpoint }) => {
   const finalUrl = USER_API_URL + endpoint
@@ -11,53 +10,41 @@ const makeUserRequest = ({ method, body = null, endpoint }) => {
   })
 }
 
-export const getSurfers = ({ username }) => {
+export const getSurfers = () => {
   return makeUserRequest({
-    endpoint: `/surfers/${username}`,
+    endpoint: `/list/surfer/`,
     method: 'GET'
   })
 }
 
-export const getSurfees = () => {
-  return makeUserRequest({
-    endpoint: '/surfees',
-    method: 'GET'
-  })
-}
-
-export const createUser = ({ username, email, accountType }) => {
+export const createUser = ({ username, email, accountType, password }) => {
   return makeUserRequest({
     endpoint: '/',
     method: 'POST',
     body: {
       username,
       email,
-      accountType
+      accountType,
+      password
     }
   })
 }
 
-export const getUserFromEmail = ({ email }) => {
+export const getUser = ({ username, userId }) => {
+  const userIdentifier = username || userId
   return makeUserRequest({
-    endpoint: `/email/${email}`,
+    endpoint: `/${userIdentifier}`,
     method: 'GET'
   })
 }
 
-export const getUserFromUsername = ({ username }) => {
-  return makeUserRequest({
-    endpoint: `/username/${username}`,
-    method: 'GET'
-  })
-}
-
-export const updateUserFromUsername = ({ username, data }) => {
-  return makeUserRequest({
-    endpoint: '/',
-    method: 'PUT',
-    body: {
-      username,
-      data
-    }
-  })
+export const verifyUser = ({ username, id }) => {
+	return makeUserRequest({
+		endpoint: '/verify',
+		method: 'POST',
+		body: {
+				username,
+				id
+		}
+})
 }

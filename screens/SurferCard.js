@@ -20,18 +20,18 @@ class SurferCard extends Component {
     })
   }
   render () {
-    const { surfer } = this.props
+				const { surfer: { profile } } = this.props
     const {
       firstName,
       lastName,
       hourlyRate,
-      profileImagePath,
+      profilePicture,
       username
-    } = surfer
+    } = profile
     const surferDisplayName =
       firstName && lastName ? `${firstName} ${lastName}` : username
-    const thumbnailImageSource = profileImagePath
-      ? { uri: profileImagePath }
+    const thumbnailImageSource = profilePicture
+      ? { uri: profilePicture } 
       : require('../assets/default-avatar.png')
     return (
       <Card style={{ marginLeft: 10, marginRight: 10, marginBottom: 10 }}>

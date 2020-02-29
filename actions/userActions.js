@@ -3,7 +3,6 @@ export const setUser = ({ user }) => ({
   payload: user
 })
 
-export const setConversations = ({ conversations }) => ({
-  type: 'SET_CONVERSATIONS',
-  payload: conversations
+export const clearUserData = () => ({
+  type: 'CLEAR_DATA'
 })

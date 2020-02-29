@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import { View } from 'react-native'
-import { signIn } from './auth'
+import { View, AsyncStorage } from 'react-native'
 import AutoHeightImage from 'react-native-auto-height-image'
 import {
   Container,
@@ -13,9 +12,16 @@ import {
   Spinner
 } from 'native-base'
 import { bindActionCreators } from 'redux'
+import { signIn } from '../authentication/auth'
 import { connect } from 'react-redux'
-import { setUser, setConversations } from '../actions/userActions'
+import { setUser } from '../actions/userActions'
 import { setSurfers } from '../actions/surferActions'
+import { setChats } from '../actions/chatActions'
+import { setNotifications } from '../actions/notificaitonActions'
+import { getSurfers, getUser } from 'surfingit/api/user'
+import { getConversations } from 'surfingit/api/chat'
+import { getNotifications } from 'surfingit/api/notifications'
+import socket from '../socket/'
 
 class Login extends Component {
   state = {
@@ -51,19 +57,56 @@ class Login extends Component {
   }
 
   handleLogin = async () => {
-    this.setLoggingInStatus({ status: true })
-    const { navigation, setUser, setConversations, setSurfers } = this.props
-    const { username, password } = this.state
-    await signIn({
-      username,
-      password,
-      navigate: navigation.navigate,
-      setLoggingInStatus: this.setLoggingInStatus,
+    const {
+      navigation,
       setUser,
-      setConversations,
       setSurfers,
-      setLoginError: this.setLoginError
-    })
+      setNotifications,
+      setChats
+    } = this.props
+    const { username, password } = this.state
+    this.setLoggingInStatus({ status: true })
+    try {
+      const userFromCognito = await signIn({ username, password })
+      if (userFromCognito.challengeName === 'NEW_PASSWORD_REQUIRED') {
+      } else {
+        const { signInUserSession } = userFromCognito
+        const userDataFromToken = signInUserSession.accessToken.payload
+        const accessToken = signInUserSession.accessToken.jwtToken
+        const { username } = userDataFromToken
+        const idToken = signInUserSession.idToken.jwtToken
+        await AsyncStorage.setItem('userToken', accessToken)
+        await AsyncStorage.setItem('idToken', idToken)
+        const {
+          data: { users: surfers }
+        } = await getSurfers()
+        const {
+          data: { user }
+        } = await getUser({ username })
+        const {
+          data: { chats }
+        } = await getConversations({ userId: user.id })
+        const {
+          data: { notifications }
+        } = await getNotifications({ userId: user.id })
+        setNotifications({ notifications })
+        setChats({ chats })
+        setUser({ user })
+        setSurfers({ surfers })
+        socket.emit('userLoggedIn', user)
+        navigation.navigate('App')
+      }
+    } catch (err) {
+      const isUserNotConfirmed = err.code === 'UserNotConfirmedException'
+      if (isUserNotConfirmed) {
+        navigation.navigate('SignupVerify', {
+          username
+        })
+      } else {
+        this.setLoginError({ error: err.message })
+      }
+      this.setLoggingInStatus({ status: false })
+    }
   }
 
   render () {
@@ -145,8 +188,9 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       setUser,
-      setConversations,
-      setSurfers
+      setSurfers,
+      setNotifications,
+      setChats
     },
     dispatch
   )

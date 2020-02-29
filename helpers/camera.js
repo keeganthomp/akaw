@@ -10,14 +10,14 @@ export const getCameraPermisions = async () => {
   const cameraPermission = await ImagePicker.getCameraPermissionsAsync()
   const { status: existingCameraPermissions } = cameraPermission
   if (existingCameraPermissions !== 'granted') {
-    const permissionFromUser = await askCameraPermisions()
-    return permissionFromUser
+			console.log('HEREe')
+    await askCameraPermisions()
   } else {
     return existingCameraPermissions
   }
 }
 
-const askCameraRollPermisions = async () => {
+export const askCameraRollPermisions = async () => {
   const cameraRollPermission = await ImagePicker.requestCameraRollPermissionsAsync()
   const { status } = cameraRollPermission
   return status

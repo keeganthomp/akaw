@@ -3,12 +3,13 @@ import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { createStackNavigator } from 'react-navigation-stack'
 import { View, Text } from 'react-native'
 import { Icon, Badge } from 'native-base'
-import SurferList from '../components/SurferList'
-import SurferDetail from '../components/SurferDetail'
-import Chat from '../components/Chat'
-import HomeScreen from '../components/Homescreen'
-import Notifications from '../components/Notifications'
-import Account from '../components/Account'
+import SurferList from '../screens/SurferList'
+import SurferDetail from '../screens/SurferDetail'
+import Chat from '../screens/Chat'
+import HomeScreen from '../screens/Homescreen'
+import ChatList from '../screens/ChatList'
+import Profile from '../screens/Profile'
+import NotificationIcon from './NotificationIcon'
 
 const NAV_ICON_SIZE = 35
 
@@ -22,28 +23,6 @@ SurferStack.navigationOptions = ({ navigation }) => {
   const tabBarVisible = navigation.state.index !== 2
   return {
     tabBarVisible
-  }
-}
-
-const renderNotificationIcon = ({ count, name, tintColor }) => {
-  if (count) {
-    return (
-      <View>
-        <Badge style={{ position: 'absolute', zIndex: 9, right: -7, widht: 5, height: 20 }}>
-          <Text style={{ fontSize: 12, color: '#fff' }}>{count}</Text>
-        </Badge>
-        <Icon size={NAV_ICON_SIZE} name={name} style={{ color: tintColor }} />
-      </View>
-    )
-  } else {
-    return (
-      <Icon
-        size={NAV_ICON_SIZE}
-        type='ionicon'
-        name={name}
-        style={{ color: tintColor }}
-      />
-    )
   }
 }
 
@@ -71,23 +50,23 @@ const MainTabs = createBottomTabNavigator(
         )
       }
     },
-    NotificationScreen: {
-      screen: Notifications,
+    ChatListScreen: {
+      screen: ChatList,
       navigationOptions: ({ screenProps }) => {
-        const { notifications } = screenProps
         return {
-          title: 'notifications',
-          tabBarIcon: ({ tintColor, focused }) =>
-            renderNotificationIcon({
-              count: 4,
-              name: 'ios-chatbubbles',
-              tintColor
-            })
+          title: 'chat-list',
+          tabBarIcon: ({ tintColor, focused }) => (
+            <NotificationIcon
+              size={NAV_ICON_SIZE}
+              name='contacts'
+              tintColor={tintColor}
+            />
+          )
         }
       }
     },
-    Account: {
-      screen: Account,
+    Profile: {
+      screen: Profile,
       navigationOptions: {
         title: 'my-account',
         tabBarIcon: ({ tintColor, focused }) => (

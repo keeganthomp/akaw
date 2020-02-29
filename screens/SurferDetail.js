@@ -39,7 +39,16 @@ class SurferDetail extends Component {
   render () {
     const { navigation } = this.props
     const { surfer } = this.state
-    const { firstName, lastName, hourlyRate, profileImagePath } = surfer
+    const { profile } = surfer
+    const {
+      firstName,
+      lastName,
+      hourlyRate,
+      profilePicture,
+      yearsOfExperience,
+      equipmentOffered
+    } = profile
+    const doesOfferEquipment = equipmentOffered && equipmentOffered.length > 0
     return (
       <Container>
         <Header>
@@ -67,8 +76,8 @@ class SurferDetail extends Component {
             >
               <Image
                 source={
-                  profileImagePath
-                    ? { uri: profileImagePath }
+                  profilePicture
+                    ? { uri: profilePicture }
                     : require('../assets/default-avatar.png')
                 }
                 style={{
@@ -100,8 +109,8 @@ class SurferDetail extends Component {
                 height: 75
               }}
             >
-              <Text style={styles.labelText}>Location:</Text>
-              <Text>92013 (San Diego)</Text>
+              <Text style={styles.labelText}>Years of Experience:</Text>
+              <Text>{yearsOfExperience}</Text>
             </Row>
             <Row
               style={{
@@ -114,6 +123,33 @@ class SurferDetail extends Component {
               <Text style={styles.labelText}>Hourly Rate:</Text>
               <Text>{hourlyRate ? `$${hourlyRate}/hour` : '--'}</Text>
             </Row>
+            <Row
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 75
+              }}
+            >
+              <Text style={styles.labelText}>Equipment Offered:</Text>
+              <Text>
+                {doesOfferEquipment
+                  ? equipmentOffered.join(', ')
+                  : 'No Equipment Offered'}
+              </Text>
+            </Row>
+            <Row
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 75
+              }}
+            >
+              <Text style={styles.labelText}>Location:</Text>
+              <Text>92013 (San Diego)</Text>
+            </Row>
+
             <Row
               style={{
                 display: 'flex',

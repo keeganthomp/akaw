@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import { confrimSingup, signIn } from './auth'
+import { connect } from 'react-redux'
+import { confrimSingup } from '../authentication/auth'
+import { verifyUser } from 'surfingit/api/user'
 import {
   Container,
   Content,
@@ -12,10 +14,13 @@ import {
 } from 'native-base'
 
 class VerifySignup extends Component {
-  state = {
-    error: null,
-    verificationCode: null,
-    isVerifyingUser: false
+  constructor () {
+    super()
+    this.state = {
+      error: null,
+      verificationCode: null,
+      isVerifyingUser: false
+    }
   }
 
   setUsername = ({ username }) => {
@@ -23,28 +28,17 @@ class VerifySignup extends Component {
   }
 
   handleVerification = async () => {
+				const { user: { username }, navigation } = this.props
+				const userNameFromLogin = this.props.navigation.getParam('username')
     const { verificationCode } = this.state
-    const {
-      username,
-      password,
-      navigate,
-      setUser,
-      setConversations,
-      setSurfers
-    } = this.props
     this.setState({ isVerifyingUser: true })
     try {
-      await confrimSingup({ username, code: verificationCode })
-      await signIn({
-        username,
-        password,
-        navigate,
-        setUser,
-        setConversations,
-        setSurfers
-      })
+						await confrimSingup({ username: username || userNameFromLogin, code: verificationCode })
+						await verifyUser({ username: username || userNameFromLogin })
+						navigation.navigate('Login')
+      this.setState({ isVerifyingUser: false })
     } catch (error) {
-      console.log('Error signing up:', error)
+      console.log('Error verifying code:', error)
       this.setState({ isVerifyingUser: false })
     }
   }
@@ -97,4 +91,9 @@ class VerifySignup extends Component {
   }
 }
 
-export default VerifySignup
+const mapStateToProps = state => {
+  const { user } = state
+  return { user }
+}
+
+export default connect(mapStateToProps)(VerifySignup)
