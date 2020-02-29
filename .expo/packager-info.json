@@ -3,7 +3,8 @@
   "expoServerPort": null,
   "packagerPort": null,
   "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null
+  "expoServerNgrokUrl": "https://kj-vs4.whereiskeegan.surfingit.exp.direct",
+  "packagerNgrokUrl": "https://packager.kj-vs4.whereiskeegan.surfingit.exp.direct",
+  "ngrokPid": 5637,
+  "webpackServerPort": null
 }
