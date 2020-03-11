@@ -4,5 +4,10 @@ export const setUser = ({ user }) => ({
 })
 
 export const clearUserData = () => ({
-  type: 'CLEAR_DATA'
+  type: 'CLEAR_USER'
+})
+
+export const updateUserProfile = ({ profile }) => ({
+  type: 'UPDATE_USER_PROFILE',
+  payload: profile
 })

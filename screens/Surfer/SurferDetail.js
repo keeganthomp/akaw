@@ -15,6 +15,9 @@ import { StyleSheet } from 'react-native'
 import { Row, Grid } from 'react-native-easy-grid'
 import { Image } from 'react-native'
 import { connect } from 'react-redux'
+import { getConversation } from '../../api/chat'
+import { primaryColor, backgroundColor } from '../../constants/colors'
+import { Entypo } from '@expo/vector-icons'
 
 class SurferDetail extends Component {
   constructor (props) {
@@ -26,13 +29,20 @@ class SurferDetail extends Component {
   static navigationOptions = {
     header: null
   }
-  handleMessageOpen = () => {
+  handleMessageOpen = async () => {
     const { navigation, user } = this.props
     const { surfer } = this.state
+    const {
+      data: { chat }
+    } = await getConversation({
+      receiverId: surfer.id,
+      senderId: user.id
+    })
     navigation.navigate('Chat', {
       sender: user,
       receiver: surfer,
-      image: user.profileImagePath || null
+      image: user.profileImagePath || null,
+      chatId: chat.id
     })
   }
 
@@ -50,18 +60,17 @@ class SurferDetail extends Component {
     } = profile
     const doesOfferEquipment = equipmentOffered && equipmentOffered.length > 0
     return (
-      <Container>
-        <Header>
+      <Container style={{ backgroundColor }}>
+        <Header style={{ borderBottomWidth: 0, backgroundColor }}>
           <Left>
             <Button transparent onPress={() => navigation.goBack()}>
-              <Icon style={{ color: '#51F6BB' }} name='arrow-dropleft-circle' />
+              <Entypo
+                name='chevron-small-left'
+                size={42}
+                color={primaryColor}
+              />
             </Button>
           </Left>
-          <Body>
-            <Title>
-              {firstName} {lastName}
-            </Title>
-          </Body>
           <Right />
         </Header>
         <Content>
@@ -78,7 +87,7 @@ class SurferDetail extends Component {
                 source={
                   profilePicture
                     ? { uri: profilePicture }
-                    : require('../assets/default-avatar.png')
+                    : require('../../assets/default-avatar.png')
                 }
                 style={{
                   width: 200,
@@ -164,7 +173,7 @@ class SurferDetail extends Component {
                 style={{
                   marginHorizontal: 5,
                   marginVertical: 10,
-                  backgroundColor: '#51F6BB'
+                  backgroundColor: primaryColor
                 }}
               >
                 <Icon style={{ color: '#fff' }} name='mail' />

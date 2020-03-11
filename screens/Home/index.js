@@ -12,13 +12,14 @@ import {
   Title
 } from 'native-base'
 import { connect } from 'react-redux'
+import { primaryColor, backgroundColor } from '../../constants/colors'
 
 class HomeScreen extends Component {
   state = {
     user: null
   }
   static navigationOptions = {
-    header: null
+    // header: null
   }
 
   handleBookNow = () => {
@@ -28,14 +29,7 @@ class HomeScreen extends Component {
 
   render () {
     return (
-      <Container>
-        <Header>
-          <Left></Left>
-          <Body>
-            <Title>Welcome</Title>
-          </Body>
-          <Right></Right>
-        </Header>
+      <Container style={{ backgroundColor }}>
         <Content
           contentContainerStyle={{
             flex: 1,
@@ -51,7 +45,7 @@ class HomeScreen extends Component {
             style={{
               textAlign: 'center',
               marginTop: 10,
-              backgroundColor: '#51F6BB'
+              backgroundColor: primaryColor
             }}
           >
             <Text style={{ textAlign: 'center' }}>Book Now</Text>

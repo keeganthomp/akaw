@@ -19,10 +19,10 @@ import {
   Textarea,
   ListItem
 } from 'native-base'
-import { Col, Row, Grid } from 'react-native-easy-grid'
-import { Image, View, TextInput } from 'react-native'
+import { Row, Grid } from 'react-native-easy-grid'
+import { Image } from 'react-native'
 import { connect } from 'react-redux'
-import { logout } from '../authentication/auth'
+import { logout } from '../../authentication'
 import { updateProfile } from 'surfingit/api/profile'
 import { uploadImageOnS3 } from 'surfingit/api/s3'
 import {
@@ -31,9 +31,17 @@ import {
   openImageSelector,
   openCamera,
   askCameraRollPermisions
-} from '../helpers/camera'
-import { setUser, clearUserData } from '../actions/userActions'
+} from '../../helpers/camera'
+import {
+  setUser,
+  clearUserData,
+  updateUserProfile
+} from '../../actions/userActions'
+import { clearNotifications } from '../../actions/notificaitonActions'
+import { clearSurfers } from '../../actions/surferActions'
+import { clearChats } from '../../actions/chatActions'
 import { bindActionCreators } from 'redux'
+import { primaryColor, backgroundColor }  from '../../constants/colors'
 
 const EQUIPMENT = [
   {
@@ -79,14 +87,26 @@ class Profile extends Component {
       hourlyRate: profile.hourlyRate ? profile.hourlyRate.toString() : null
     }
   }
+  clearData = () => {
+    const {
+      clearUserData,
+      clearNotifications,
+      clearSurfers,
+      clearChats
+    } = this.props
+    clearUserData()
+    clearNotifications()
+    clearSurfers()
+    clearChats()
+  }
   handleLogout = () => {
-    const { navigation, clearUserData } = this.props
+    const { navigation } = this.props
     const navigate = navigation.navigate
-    logout({ navigate, clearUserData })
+    logout({ navigate, clearData: this.clearData })
   }
 
   setAndSaveProfileImage = async ({ image, imageName }) => {
-    const { user, setUser } = this.props
+    const { user, updateUserProfile } = this.props
     const { id: userId, profile: existingProfile } = user
     const { uri } = image
     const username = user.username
@@ -98,16 +118,16 @@ class Profile extends Component {
         imageName
       })
       const { location } = response.postResponse
-      setUser({
-        user
-      })
-      await updateProfile({
+      const {
+        data: { profile: updatedProfile }
+      } = await updateProfile({
         userId,
         profile: {
           ...existingProfile,
           profilePicture: location
         }
       })
+      updateUserProfile({ profile: updatedProfile })
       Toast.show({
         text: 'Profile Picture Updated',
         buttonText: 'Okay'
@@ -232,16 +252,9 @@ class Profile extends Component {
     const isSurfer = user.accountType === 'surfer'
     const profileImageSource = profilePicture
       ? { uri: profilePicture }
-      : require('../assets/default-avatar.png')
+      : require('../../assets/default-avatar.png')
     return (
-      <Container>
-        <Header>
-          <Left />
-          <Body>
-            <Title>Profile</Title>
-          </Body>
-          <Right />
-        </Header>
+      <Container style={{ backgroundColor }}>
         <Content>
           <Grid>
             <Row
@@ -274,7 +287,7 @@ class Profile extends Component {
                 <Label>First Name</Label>
                 <Input
                   onChangeText={firstName => this.setState({ firstName })}
-                  placeholder='First Name'
+                  
                   value={firstName}
                   autoCapitalize='none'
                   style={{ textAlign: 'center' }}
@@ -286,7 +299,7 @@ class Profile extends Component {
                 <Input
                   onChangeText={lastName => this.setState({ lastName })}
                   value={lastName}
-                  placeholder='Last Name'
+                  
                   autoCapitalize='none'
                   placeholderText
                   style={{ textAlign: 'center' }}
@@ -298,7 +311,7 @@ class Profile extends Component {
                 <Input
                   onChangeText={hourlyRate => this.setState({ hourlyRate })}
                   value={hourlyRate}
-                  placeholder='100'
+                  
                   autoCapitalize='none'
                   placeholderText
                   style={{ textAlign: 'center' }}
@@ -311,8 +324,8 @@ class Profile extends Component {
                     onChangeText={yearsOfExperience =>
                       this.setState({ yearsOfExperience })
                     }
-                    value={yearsOfExperience ? `${yearsOfExperience}`: null}
-                    placeholder='4'
+                    value={yearsOfExperience ? `${yearsOfExperience}` : null}
+                    
                     autoCapitalize='none'
                     placeholderText
                     style={{ textAlign: 'center' }}
@@ -429,7 +442,7 @@ class Profile extends Component {
                 style={{
                   marginHorizontal: 5,
                   marginVertical: 10,
-                  backgroundColor: '#51F6BB'
+                  backgroundColor: primaryColor
                 }}
               >
                 <Text style={{ textAlign: 'center' }}>Save</Text>
@@ -471,7 +484,11 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       setUser,
-      clearUserData
+      clearUserData,
+      clearNotifications,
+      clearSurfers,
+      clearChats,
+      updateUserProfile
     },
     dispatch
   )

@@ -10,9 +10,9 @@ const makeUserRequest = ({ method, body = null, endpoint }) => {
   })
 }
 
-export const getSurfers = () => {
+export const getSurfers = ({ userId }) => {
   return makeUserRequest({
-    endpoint: `/list/surfer/`,
+    endpoint: `/list/surfer/${userId}`,
     method: 'GET'
   })
 }

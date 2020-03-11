@@ -29,9 +29,12 @@ export const getNotifications = ({ userId }) => {
 	})
 }
 
-export const updateNotification = ({ notificationId }) => {
+export const updateNotification = ({ notificationIds }) => {
 	return makeNotificationRequest({
-			endpoint: `/${notificationId}`,
-			method: 'PUT'
+			endpoint: `/`,
+			method: 'PUT',
+			body: {
+				notificationIds
+			}
 	})
 }

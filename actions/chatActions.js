@@ -3,10 +3,39 @@ export const setChats = ({ chats }) => ({
   payload: chats
 })
 
-export const addMessageToChat = ({ chat, message }) => ({
-  type: 'ADD_MESSAGE_TO_CHAT',
+export const isFetchingConversation = () => ({
+  type: 'IS_FETCHING_CONVERSATION' 
+})
+
+export const addConversation = ({ conversation }) => ({
+  type: 'ADD_CONVERSATION',
+  payload: conversation
+})
+
+export const addMessageToConversation = ({ conversation, message }) => ({
+  type: 'ADD_MESSAGE_TO_CONVERSATIONS',
   payload: {
-    chat,
-    message
+    message,
+    conversation
   }
+})
+
+export const setUserIsTyping = ({ conversationId, isTyping }) => ({
+  type: 'SET_USER_IS_TYPING',
+  payload: {
+    conversationId,
+    isTyping
+  }
+})
+
+export const setUserNotTyping = ({ conversationId, isTyping }) => ({
+  type: 'SET_USER_IS_NOT_TYPING',
+  payload: {
+    conversationId,
+    isTyping
+  }
+})
+
+export const clearChats = () => ({
+  type: 'CLEAR_CHATS'
 })

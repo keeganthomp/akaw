@@ -1,5 +1,6 @@
 import Amplify, { Auth } from 'aws-amplify'
 import { AsyncStorage } from 'react-native'
+import { disconnectUserFromSocket } from '../socket'
 
 import {
   AWS_IDENTITY_POOL_ID,
@@ -39,9 +40,10 @@ export const signIn = ({ username, password }) => {
   return Auth.signIn(username, password)
 }
 
-export const logout = async ({ navigate, clearUserData }) => {
-  await Auth.signOut({ global: true })
-  clearUserData()
+export const logout = async ({ navigate, clearData }) => {
+		// await Auth.signOut({ global: true })
+		disconnectUserFromSocket()
+  clearData()
   AsyncStorage.clear()
   navigate('Auth')
 }

@@ -2,30 +2,40 @@ import React from 'react'
 import { View, Text } from 'react-native'
 import { Icon, Badge } from 'native-base'
 import { connect } from 'react-redux'
+import {  AntDesign } from '@expo/vector-icons'
 
 class NotificationIcon extends React.Component {
   render () {
-				const { notifications, tintColor, size } = this.props
-    const doesUserHaveNotifications = notifications && notifications.length > 0
-    return doesUserHaveNotifications ? (
+    const { notifications, tintColor, size } = this.props
+    const unreadNotifications =
+      notifications &&
+      notifications.filter(notification => !notification.hasBeenSeen)
+    return unreadNotifications && unreadNotifications.length > 0 ? (
       <View>
         <Badge
           style={{
             position: 'absolute',
             zIndex: 9,
             right: -7,
-            widht: 5,
             height: 20
           }}
         >
           <Text style={{ fontSize: 12, color: '#fff' }}>
-            {notifications.length}
+            {unreadNotifications.length}
           </Text>
         </Badge>
-        <Icon size={size} name='ios-chatbubbles' style={{ color: tintColor }} />
+        <AntDesign
+          name='message1'
+          size={size}
+          color={tintColor}
+        />
       </View>
     ) : (
-      <Icon size={size} name='ios-chatbubbles' style={{ color: tintColor }} />
+      <AntDesign
+        name='message1'
+        size={size}
+        color={tintColor}
+      />
     )
   }
 }

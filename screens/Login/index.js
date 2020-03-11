@@ -9,19 +9,21 @@ import {
   Input,
   Button,
   Text,
-  Spinner
+  Spinner,
+  Label
 } from 'native-base'
 import { bindActionCreators } from 'redux'
-import { signIn } from '../authentication/auth'
+import { signIn } from '../../authentication'
 import { connect } from 'react-redux'
-import { setUser } from '../actions/userActions'
-import { setSurfers } from '../actions/surferActions'
-import { setChats } from '../actions/chatActions'
-import { setNotifications } from '../actions/notificaitonActions'
+import { setUser } from '../../actions/userActions'
+import { setSurfers } from '../../actions/surferActions'
+import { setChats } from '../../actions/chatActions'
+import { setNotifications } from '../../actions/notificaitonActions'
 import { getSurfers, getUser } from 'surfingit/api/user'
 import { getConversations } from 'surfingit/api/chat'
 import { getNotifications } from 'surfingit/api/notifications'
-import socket from '../socket/'
+import { initSocketConnection } from '../../socket'
+import { primaryColor } from '../../constants/colors'
 
 class Login extends Component {
   state = {
@@ -62,7 +64,8 @@ class Login extends Component {
       setUser,
       setSurfers,
       setNotifications,
-      setChats
+      setChats,
+      dispatch
     } = this.props
     const { username, password } = this.state
     this.setLoggingInStatus({ status: true })
@@ -78,11 +81,11 @@ class Login extends Component {
         await AsyncStorage.setItem('userToken', accessToken)
         await AsyncStorage.setItem('idToken', idToken)
         const {
-          data: { users: surfers }
-        } = await getSurfers()
-        const {
           data: { user }
         } = await getUser({ username })
+        const {
+          data: { users: surfers }
+        } = await getSurfers({ userId: user.id })
         const {
           data: { chats }
         } = await getConversations({ userId: user.id })
@@ -93,7 +96,7 @@ class Login extends Component {
         setChats({ chats })
         setUser({ user })
         setSurfers({ surfers })
-        socket.emit('userLoggedIn', user)
+        initSocketConnection({ userId: user.id, dispatch })
         navigation.navigate('App')
       }
     } catch (err) {
@@ -112,49 +115,41 @@ class Login extends Component {
   render () {
     const { username, password, error, isLoggingIn } = this.state
     return (
-      <Container>
+      <Container style={{ backgroundColor: '#f6f6f6' }}>
         {isLoggingIn ? (
           <Content
             contentContainerStyle={{ justifyContent: 'center', flex: 1 }}
           >
-            <Spinner color='#51F6BB' />
+            <Spinner color={primaryColor} />
             <Text style={{ textAlign: 'center' }}>Logging in</Text>
           </Content>
         ) : (
           <Content
-            contentContainerStyle={{ justifyContent: 'center', flex: 1 }}
+            contentContainerStyle={{
+              justifyContent: 'center',
+              flex: 1,
+              marginLeft: 15,
+              marginRight: 15
+            }}
           >
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
-            >
-              <AutoHeightImage
-                width={300}
-                source={require('../assets/surfer-logo.png')}
+            <Item stackedLabel>
+              <Label>Username</Label>
+              <Input
+                onChangeText={username => this.setUsername({ username })}
+                value={username}
+                autoCapitalize='none'
               />
-            </View>
-            <Form>
-              <Item>
-                <Input
-                  onChangeText={username => this.setUsername({ username })}
-                  placeholder='Username'
-                  value={username}
-                  autoCapitalize='none'
-                />
-              </Item>
-              <Item last>
-                <Input
-                  onChangeText={password => this.setPassword({ password })}
-                  value={password}
-                  secureTextEntry
-                  placeholder='Password'
-                  autoCapitalize='none'
-                  placeholderText
-                />
-              </Item>
-            </Form>
+            </Item>
+            <Item stackedLabel>
+              <Label>Password</Label>
+              <Input
+                onChangeText={password => this.setPassword({ password })}
+                value={password}
+                secureTextEntry
+                autoCapitalize='none'
+                placeholderText
+              />
+            </Item>
             {error && (
               <Text style={{ color: 'red', textAlign: 'center', marginTop: 8 }}>
                 {error}
@@ -165,18 +160,12 @@ class Login extends Component {
               onPress={() => this.handleLogin()}
               style={{
                 marginHorizontal: 5,
-                marginVertical: 10,
-                backgroundColor: '#51F6BB'
+                marginVertical: 28,
+                backgroundColor: primaryColor
               }}
             >
               <Text style={{ textAlign: 'center' }}>Login</Text>
             </Button>
-            <Text
-              style={{ textAlign: 'center' }}
-              onPress={() => this.props.navigation.navigate('Signup')}
-            >
-              Sign up
-            </Text>
           </Content>
         )}
       </Container>
@@ -190,7 +179,8 @@ const mapDispatchToProps = dispatch =>
       setUser,
       setSurfers,
       setNotifications,
-      setChats
+      setChats,
+      dispatch
     },
     dispatch
   )

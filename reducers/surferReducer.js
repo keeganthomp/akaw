@@ -9,7 +9,9 @@ const surferReducer = (state = INITIAL_STATE, action) => {
       const newState = {
         listOfSurfers: surfers
       }
-      return newState;
+      return newState
+    case 'CLEAR_SURFERS':
+      return INITIAL_STATE
     default:
       return state
   }

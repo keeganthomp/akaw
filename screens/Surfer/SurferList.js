@@ -12,6 +12,7 @@ import {
   Title
 } from 'native-base'
 import { connect } from 'react-redux'
+import { primaryColor, backgroundColor } from '../../constants/colors'
 
 class SurferList extends Component {
   constructor (props) {
@@ -27,12 +28,7 @@ class SurferList extends Component {
     const { navigation, surfer } = this.props
     const { listOfSurfers } = surfer
     return (
-      <Container>
-        <Header>
-          <Body>
-            <Title>Select a surfer</Title>
-          </Body>
-        </Header>
+      <Container style={{ backgroundColor }}>
         <Content>
           {listOfSurfers.map(surfer => (
             <SurferCard

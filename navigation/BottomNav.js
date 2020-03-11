@@ -1,23 +1,41 @@
 import React from 'react'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { createStackNavigator } from 'react-navigation-stack'
-import { View, Text } from 'react-native'
-import { Icon, Badge } from 'native-base'
-import SurferList from '../screens/SurferList'
-import SurferDetail from '../screens/SurferDetail'
+import { Icon } from 'native-base'
+import SurferList from '../screens/Surfer/SurferList'
+import SurferDetail from '../screens/Surfer/SurferDetail'
 import Chat from '../screens/Chat'
-import HomeScreen from '../screens/Homescreen'
-import ChatList from '../screens/ChatList'
+import HomeScreen from '../screens/Home'
+import ChatList from '../screens/Chat/ChatList'
 import Profile from '../screens/Profile'
 import NotificationIcon from './NotificationIcon'
-
-const NAV_ICON_SIZE = 35
+import { primaryColor } from '../constants/colors'
+import { EvilIcons, AntDesign, Feather } from '@expo/vector-icons'
+import ChatHeader from '../screens/Chat/ChatHeader'
+const NAV_ICON_SIZE = 25
 
 const SurferStack = createStackNavigator({
   SurferList,
-  SurferDetail,
-  Chat
+  SurferDetail
 })
+
+const ChatStack = createStackNavigator(
+  {
+    Chat,
+    ChatList
+  },
+  {
+    initialRouteName: 'ChatList',
+    headerMode: 'none',
+  }
+)
+
+ChatStack.navigationOptions = ({ navigation }) => {
+	const tabBarVisible = navigation.state.index < 1
+	return {
+			tabBarVisible
+	}
+}
 
 SurferStack.navigationOptions = ({ navigation }) => {
   const tabBarVisible = navigation.state.index !== 2
@@ -33,7 +51,7 @@ const MainTabs = createBottomTabNavigator(
       navigationOptions: {
         title: 'Home',
         tabBarIcon: ({ tintColor, focused }) => (
-          <Icon size={NAV_ICON_SIZE} name='home' style={{ color: tintColor }} />
+          <AntDesign name='home' size={NAV_ICON_SIZE} color={tintColor} />
         )
       }
     },
@@ -42,17 +60,13 @@ const MainTabs = createBottomTabNavigator(
       navigationOptions: {
         title: 'surfer-list',
         tabBarIcon: ({ tintColor, focused }) => (
-          <Icon
-            size={NAV_ICON_SIZE}
-            name='contacts'
-            style={{ color: tintColor }}
-          />
+          <Feather size={NAV_ICON_SIZE} name='users' color={tintColor} />
         )
       }
     },
-    ChatListScreen: {
-      screen: ChatList,
-      navigationOptions: ({ screenProps }) => {
+    ChatScreen: {
+      screen: ChatStack,
+      navigationOptions: () => {
         return {
           title: 'chat-list',
           tabBarIcon: ({ tintColor, focused }) => (
@@ -70,11 +84,7 @@ const MainTabs = createBottomTabNavigator(
       navigationOptions: {
         title: 'my-account',
         tabBarIcon: ({ tintColor, focused }) => (
-          <Icon
-            size={NAV_ICON_SIZE}
-            name='person'
-            style={{ color: tintColor }}
-          />
+          <Feather name='user' size={NAV_ICON_SIZE} color={tintColor} />
         )
       }
     }
@@ -84,8 +94,9 @@ const MainTabs = createBottomTabNavigator(
       showLabel: false,
       activeTintColor: '#333',
       inactiveTintColor: '#fff',
+      keyboardHidesTabBar: false,
       style: {
-        backgroundColor: '#51F6BB'
+        backgroundColor: primaryColor
       }
     }
   }

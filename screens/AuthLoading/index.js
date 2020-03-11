@@ -1,14 +1,15 @@
 import React from 'react'
 import { ActivityIndicator, AsyncStorage, StatusBar, View } from 'react-native'
 import { connect } from 'react-redux'
-import { setUser } from '../actions/userActions'
-import { setSurfers } from '../actions/surferActions'
-import { setChats } from '../actions/chatActions'
-import { setNotifications } from '../actions/notificaitonActions'
+import { setUser } from '../../actions/userActions'
+import { setSurfers } from '../../actions/surferActions'
+import { setChats } from '../../actions/chatActions'
+import { setNotifications } from '../../actions/notificaitonActions'
 import { bindActionCreators } from 'redux'
 import { getSurfers, getUser } from 'surfingit/api/user'
 import { getConversations } from 'surfingit/api/chat'
 import { getNotifications } from 'surfingit/api/notifications'
+import { getSocketConnectionStatus, initSocketConnection } from '../../socket'
 const jwtDecode = require('jwt-decode')
 
 class AuthLoadingScreen extends React.Component {
@@ -26,14 +27,14 @@ class AuthLoadingScreen extends React.Component {
   }
 
   fetchAndSetInitialData = async ({ username }) => {
-    const { setUser, setSurfers, setChats, setNotifications } = this.props
+				const { setUser, setSurfers, setChats, setNotifications, dispatch } = this.props
     try {
-      const {
-        data: { users: surfers }
-      } = await getSurfers()
       const {
         data: { user }
       } = await getUser({ username })
+      const {
+        data: { users: surfers }
+      } = await getSurfers({ userId: user.id })
       const {
         data: { chats }
       } = await getConversations({ userId: user.id })
@@ -44,6 +45,7 @@ class AuthLoadingScreen extends React.Component {
       setChats({ chats })
       setUser({ user })
       setSurfers({ surfers })
+      initSocketConnection({ userId: user.id, dispatch })
     } catch (error) {
       throw new Error('Unable to fetch data')
     }
@@ -82,7 +84,8 @@ const mapDispatchToProps = dispatch =>
       setUser,
       setSurfers,
       setChats,
-      setNotifications
+						setNotifications,
+						dispatch
     },
     dispatch
   )

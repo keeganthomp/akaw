@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { confrimSingup } from '../authentication/auth'
+import { confrimSingup } from '../../authentication'
 import { verifyUser } from 'surfingit/api/user'
 import {
   Container,
@@ -12,6 +12,7 @@ import {
   Text,
   Spinner
 } from 'native-base'
+import { primaryColor } from '../../constants/colors'
 
 class VerifySignup extends Component {
   constructor () {
@@ -28,14 +29,20 @@ class VerifySignup extends Component {
   }
 
   handleVerification = async () => {
-				const { user: { username }, navigation } = this.props
-				const userNameFromLogin = this.props.navigation.getParam('username')
+    const {
+      user: { username },
+      navigation
+    } = this.props
+    const userNameFromLogin = this.props.navigation.getParam('username')
     const { verificationCode } = this.state
     this.setState({ isVerifyingUser: true })
     try {
-						await confrimSingup({ username: username || userNameFromLogin, code: verificationCode })
-						await verifyUser({ username: username || userNameFromLogin })
-						navigation.navigate('Login')
+      await confrimSingup({
+        username: username || userNameFromLogin,
+        code: verificationCode
+      })
+      await verifyUser({ username: username || userNameFromLogin })
+      navigation.navigate('Signin')
       this.setState({ isVerifyingUser: false })
     } catch (error) {
       console.log('Error verifying code:', error)
@@ -51,7 +58,7 @@ class VerifySignup extends Component {
           <Content
             contentContainerStyle={{ justifyContent: 'center', flex: 1 }}
           >
-            <Spinner color='#51F6BB' />
+            <Spinner color={primaryColor} />
             <Text style={{ textAlign: 'center' }}>Verifying User</Text>
           </Content>
         ) : (
